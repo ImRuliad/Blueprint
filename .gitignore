@@ -1,0 +1,454 @@
+# =============================================================================
+# CLAUDE / AI ORCHESTRATION — never expose AI config or session state
+# =============================================================================
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.claude/
+.omc/
+.remember/
+.cursorrules
+.cursorignore
+.aider*
+.continue/
+.copilot/
+*.claude-session
+*.omc-state
+
+# =============================================================================
+# SECRETS & CREDENTIALS — paranoid exclusion of anything that could leak keys
+# =============================================================================
+.env
+.env.*
+!.env.example
+!.env.template
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.csr
+*.jks
+*.keystore
+*.truststore
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+id_ecdsa
+id_ecdsa.pub
+id_dsa
+id_dsa.pub
+*.asc
+secrets.json
+secrets.yaml
+secrets.yml
+secrets.toml
+credentials.json
+credentials.yaml
+credentials.yml
+service-account*.json
+*-service-account.json
+gcloud-credentials.json
+firebase-adminsdk*.json
+google-services.json
+GoogleService-Info.plist
+.aws/
+.gcp/
+.azure/
+vault-token
+.vault-token
+.netrc
+.npmrc
+.pypirc
+auth.json
+.htpasswd
+
+# =============================================================================
+# OPERATING SYSTEM
+# =============================================================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDouble
+.LSOverride
+Icon
+*.icloud
+.localized
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# EDITORS & IDEs
+# =============================================================================
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains (IntelliJ, WebStorm, PyCharm, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.xcarchive
+
+# Vim / Neovim
+*.swp
+*.swo
+*.swn
+*.swm
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+Session.vim
+.netrwhist
+tags
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# TextMate
+*.tmproj
+*.tmproject
+tmtags
+
+# =============================================================================
+# NODE.JS / JAVASCRIPT / TYPESCRIPT
+# =============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+.npm/
+.yarn/
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+.cache/
+dist/
+dist-ssr/
+build/
+.turbo/
+.next/
+.nuxt/
+.svelte-kit/
+.output/
+.vercel/
+.netlify/
+.wrangler/
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+*.local
+coverage/
+.nyc_output/
+storybook-static/
+
+# =============================================================================
+# PYTHON
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+*.egg
+*.egg-info/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*/
+Pipfile.lock
+poetry.lock
+uv.lock
+.pdm.toml
+.pdm-python
+.pdm-build/
+__pypackages__/
+celerybeat-schedule
+celerybeat.pid
+*.sage.py
+instance/
+.webassets-cache
+.scrapy
+docs/_build/
+target/
+profile_default/
+ipython_config.py
+*.ipynb_checkpoints/
+.ipynb_checkpoints
+
+# =============================================================================
+# RUBY
+# =============================================================================
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
+.bundle/
+vendor/bundle
+lib/bundler/man/
+.rvmrc
+.rbenv-version
+Gemfile.lock
+
+# =============================================================================
+# GO
+# =============================================================================
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.sum
+vendor/
+
+# =============================================================================
+# RUST
+# =============================================================================
+target/
+Cargo.lock
+**/*.rs.bk
+
+# =============================================================================
+# JAVA / KOTLIN / JVM
+# =============================================================================
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+.mtj.tmp/
+*.ctxt
+
+# =============================================================================
+# SWIFT / iOS / macOS
+# =============================================================================
+*.resolved
+*.xcodeproj/project.xcworkspace/
+Pods/
+Carthage/Build/
+.build/
+
+# =============================================================================
+# DATABASES
+# =============================================================================
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.s3db
+*.sl3
+*.mdb
+*.ldb
+dump.rdb
+*.rdb
+
+# =============================================================================
+# LOGS & DIAGNOSTICS
+# =============================================================================
+logs/
+*.log
+*.log.*
+*.logs
+npm-debug.log
+yarn-debug.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+crash.log
+crash.*.log
+
+# =============================================================================
+# TEMPORARY & GENERATED FILES
+# =============================================================================
+tmp/
+temp/
+.tmp/
+.temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.patch
+*.diff
+*.rej
+*.old
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# ARCHIVES & BINARIES
+# =============================================================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.tar
+*.zip
+*.rar
+*.tgz
+*.bz2
+*.xz
+*.zst
+
+# =============================================================================
+# DOCKER
+# =============================================================================
+.docker/
+docker-compose.override.yml
+docker-compose.local.yml
+.dockerignore.local
+
+# =============================================================================
+# TERRAFORM / INFRASTRUCTURE
+# =============================================================================
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraformrc
+terraform.rc
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# =============================================================================
+# MISCELLANEOUS
+# =============================================================================
+.history/
+.localhistory/
+.ionide/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+nbproject/
+local.properties
+.classpath
+.project
+.settings/
+*.launch
