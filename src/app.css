@@ -53,3 +53,86 @@ body {
 .font-mono, code, pre, kbd {
   font-family: 'Geist Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
 }
+
+/* ============================================================
+   Typography Utility Classes
+   ============================================================ */
+
+.text-col-header {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.text-data-cell {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.text-section-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-ghost);
+}
+
+.text-logo {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   Component Patterns
+   ============================================================ */
+
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 1px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.status-dot--connected { background-color: var(--accent-green); }
+.status-dot--disconnected { background-color: var(--text-ghost); }
+
+.engine-badge {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  padding: 1px 4px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+.engine-badge--pg { color: var(--accent-blue); background-color: rgba(96, 165, 250, 0.1); }
+.engine-badge--my { color: var(--accent-amber); background-color: rgba(245, 158, 11, 0.1); }
+.engine-badge--sq { color: var(--accent-green); background-color: rgba(34, 197, 94, 0.1); }
+.engine-badge--mg { color: var(--accent-purple); background-color: rgba(167, 139, 250, 0.1); }
+
+.value-null {
+  color: var(--text-ghost);
+  font-style: italic;
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.grid-row { height: var(--row-height); line-height: var(--row-height); }
+
+.cell-edited {
+  border-left: 2px solid var(--accent-amber);
+  background-color: rgba(245, 158, 11, 0.06);
+}
+
+.row-new { background-color: rgba(34, 197, 94, 0.06); }
+
+.row-deleted {
+  background-color: rgba(239, 68, 68, 0.06);
+  text-decoration: line-through;
+  color: var(--text-ghost);
+}
