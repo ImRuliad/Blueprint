@@ -1,2 +1,3 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<div class="flex items-center justify-center min-h-screen" style="background-color: var(--bg-root);">
+	<h1 class="text-2xl font-semibold" style="color: var(--text-primary);">Blueprint</h1>
+</div>

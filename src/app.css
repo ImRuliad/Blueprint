@@ -1,0 +1,45 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   Blueprint Design System — CSS Custom Properties
+   Aesthetic: Zinc Minimal — Compact Density
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --bg-root: #09090b;
+  --bg-surface: #0a0a0c;
+  --bg-elevated: #18181b;
+  --bg-muted: #1c1c1f;
+  --bg-hover: #27272a;
+  --bg-active: #27272a;
+
+  /* Borders */
+  --border: #27272a;
+  --border-subtle: #1f1f23;
+
+  /* Text hierarchy */
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-dim: #52525b;
+  --text-ghost: #3f3f46;
+
+  /* Semantic accents */
+  --accent-green: #22c55e;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-purple: #a78bfa;
+  --accent-blue: #60a5fa;
+  --accent-cyan: #22d3ee;
+
+  /* Layout constants */
+  --row-height: 24px;
+  --sidebar-width: 220px;
+
+  /* Border radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
