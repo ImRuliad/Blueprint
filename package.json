@@ -1,18 +1,28 @@
 {
-	"name": "blueprint",
+	"name": "blueprint-db",
+	"version": "0.1.0",
+	"description": "Database GUI for SQLite, PostgreSQL, MySQL, and MongoDB",
 	"private": true,
-	"version": "0.0.1",
 	"type": "module",
+	"bin": {
+		"blueprint": "./bin/cli.ts"
+	},
+	"files": ["build/", "drizzle/", "bin/"],
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
+		"start": "bun run bin/cli.ts",
+		"build:all": "bun run build",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"prepublishOnly": "bun run build:all",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate"
 	},
 	"devDependencies": {
 		"@lucide/svelte": "^1.20.0",
