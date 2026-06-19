@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
-import { connections, tlsConfigs } from '$lib/server/db/schema';
+import { connections, sshConfigs, tlsConfigs } from '$lib/server/db/schema';
 import { createPool, isConnected } from '$lib/server/drivers/pool';
 import { PostgresDriver } from '$lib/server/drivers/postgres';
 import { MySQLDriver } from '$lib/server/drivers/mysql';
@@ -11,26 +11,33 @@ import { errorResponse, NotFoundError, ValidationError } from '$lib/server/error
 import type { DatabaseDriver, EngineType } from '$lib/server/drivers/types';
 import { buildPostgresSSL, buildMySQLSSL, buildMongoTLS } from '$lib/server/tls/config';
 import type { TLSConfig } from '$lib/server/tls/config';
+import { createTunnel } from '$lib/server/ssh/tunnel';
+import type { SSHTunnelConfig } from '$lib/server/ssh/tunnel';
+import { readFileSync, existsSync } from 'fs';
 import { eq } from 'drizzle-orm';
 
 function createDriver(
 	engine: EngineType,
 	config: Record<string, unknown>,
 	tlsConfig: TLSConfig | null,
+	tunnelPort?: number
 ): DatabaseDriver {
+	const host = tunnelPort != null ? '127.0.0.1' : (config.host as string);
+	const port = tunnelPort != null ? tunnelPort : (config.port as number);
+
 	switch (engine) {
 		case 'postgresql':
 			return new PostgresDriver({
-				host: config.host as string,
-				port: config.port as number,
+				host,
+				port,
 				database: config.database as string,
 				user: config.username as string,
 				ssl: tlsConfig ? buildPostgresSSL(tlsConfig) : undefined,
 			});
 		case 'mysql':
 			return new MySQLDriver({
-				host: config.host as string,
-				port: config.port as number,
+				host,
+				port,
 				database: config.database as string,
 				user: config.username as string,
 				ssl: tlsConfig ? buildMySQLSSL(tlsConfig) : undefined,
@@ -50,6 +57,25 @@ function createDriver(
 	}
 }
 
+async function buildSSHTunnelConfig(sshConfigRow: typeof sshConfigs.$inferSelect): Promise<SSHTunnelConfig> {
+	const config: SSHTunnelConfig = {
+		host: sshConfigRow.host,
+		port: sshConfigRow.port ?? 22,
+		username: sshConfigRow.username,
+		authMethod: sshConfigRow.authMethod as SSHTunnelConfig['authMethod'],
+		useAgent: sshConfigRow.useAgent ?? false,
+	};
+
+	if (sshConfigRow.authMethod === 'privateKey' && sshConfigRow.privateKeyPath) {
+		if (!existsSync(sshConfigRow.privateKeyPath)) {
+			throw new Error(`SSH private key not found: ${sshConfigRow.privateKeyPath}`);
+		}
+		config.privateKey = readFileSync(sshConfigRow.privateKeyPath, 'utf-8');
+	}
+
+	return config;
+}
+
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
@@ -66,7 +92,16 @@ export const POST: RequestHandler = async ({ request }) => {
 			throw new NotFoundError(`Connection "${connectionId}" not found`);
 		}
 
-		// Load TLS config if the connection references one
+		const connConfig = {
+			host: row.host,
+			port: row.port,
+			database: row.database,
+			username: row.username,
+			connectionString: row.connectionString,
+			sqlitePath: row.sqlitePath,
+		};
+
+		// Load TLS config if referenced
 		let tlsConfig: TLSConfig | null = null;
 		if (row.tlsConfigId) {
 			const tlsRow = db.select().from(tlsConfigs).where(eq(tlsConfigs.id, row.tlsConfigId)).get();
@@ -81,21 +116,32 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		}
 
+		// Establish SSH tunnel if configured
+		let tunnel: { localPort: number; close(): Promise<void> } | undefined;
+		if (row.sshConfigId) {
+			const sshRow = db.select().from(sshConfigs).where(eq(sshConfigs.id, row.sshConfigId)).get();
+			if (!sshRow) {
+				throw new NotFoundError(`SSH config "${row.sshConfigId}" not found`);
+			}
+
+			const sshTunnelConfig = await buildSSHTunnelConfig(sshRow);
+			const remoteHost = row.host ?? 'localhost';
+			const remotePort = row.port ?? 5432;
+			const tunnelKey = `conn:${connectionId}`;
+
+			tunnel = await createTunnel(sshTunnelConfig, remoteHost, remotePort, tunnelKey);
+		}
+
 		const driver = createDriver(
 			row.engine as EngineType,
-			{
-				host: row.host,
-				port: row.port,
-				database: row.database,
-				username: row.username,
-				connectionString: row.connectionString,
-				sqlitePath: row.sqlitePath,
-			},
+			connConfig,
 			tlsConfig,
+			tunnel?.localPort
 		);
 
 		if (testOnly) {
 			const result = await driver.testConnection(password);
+			if (tunnel) await tunnel.close();
 			return json({ data: result });
 		}
 

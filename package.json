@@ -33,6 +33,7 @@
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@tailwindcss/vite": "^4.3.1",
 		"@types/pg": "^8.20.0",
+		"@types/ssh2": "^1.15.5",
 		"bits-ui": "^2.18.1",
 		"clsx": "^2.1.1",
 		"drizzle-kit": "^0.31.10",
@@ -52,6 +53,7 @@
 		"drizzle-orm": "^0.45.2",
 		"mongodb": "^7.3.0",
 		"mysql2": "^3.22.5",
-		"pg": "^8.22.0"
+		"pg": "^8.22.0",
+		"ssh2": "^1.17.0"
 	}
 }
