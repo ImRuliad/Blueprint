@@ -1,0 +1,15 @@
+services:
+  blueprint:
+    build: .
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - blueprint-data:/data
+      - ~/.ssh:/home/bun/.ssh:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - BLUEPRINT_DATA_DIR=/data
+
+volumes:
+  blueprint-data:
