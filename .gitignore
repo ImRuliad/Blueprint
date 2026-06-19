@@ -14,6 +14,7 @@ GEMINI.md
 .copilot/
 *.claude-session
 *.omc-state
+docs/
 
 # =============================================================================
 # SECRETS & CREDENTIALS — paranoid exclusion of anything that could leak keys
@@ -232,6 +233,7 @@ dist/
 eggs/
 .eggs/
 lib/
+!src/lib/
 lib64/
 parts/
 sdist/
@@ -435,6 +437,13 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+
+# =============================================================================
+# PLAYWRIGHT
+# =============================================================================
+test-results/
+playwright-report/
+blob-report/
 
 # =============================================================================
 # MISCELLANEOUS
