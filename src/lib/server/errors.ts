@@ -64,7 +64,7 @@ export function errorResponse(error: unknown): Response {
 			error: {
 				code: 'INTERNAL_ERROR',
 				message: 'Internal server error',
-				detail: isDev ? String(error) : undefined,
+				detail: isDev ? (error instanceof Error ? error.message : 'An unexpected error occurred') : undefined,
 			},
 		} satisfies ApiErrorResponse,
 		{ status: 500 }

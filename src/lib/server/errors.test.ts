@@ -171,6 +171,18 @@ describe('errorResponse', () => {
 		expect(body.error.message).toBe('Internal server error');
 	});
 
+	it('dev mode detail contains message only, not stack trace', async () => {
+		const originalEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = 'development';
+		const err = new Error('test error message');
+		err.stack = 'Error: test error message\n    at Object.<anonymous> (/secret/path/file.ts:10:5)';
+		const res = errorResponse(err);
+		const body = await res.json();
+		expect(body.error.detail).toBe('test error message');
+		expect(body.error.detail).not.toContain('/secret/path');
+		process.env.NODE_ENV = originalEnv;
+	});
+
 	it('returns 500 for non-Error unknown values', async () => {
 		const res = errorResponse('something went wrong');
 		expect(res.status).toBe(500);
