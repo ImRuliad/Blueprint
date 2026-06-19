@@ -7,8 +7,36 @@
 	import '@fontsource/geist-mono/600.css';
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import ConnectionSidebar from '$lib/components/connection/ConnectionSidebar.svelte';
+	import ConnectionForm from '$lib/components/connection/ConnectionForm.svelte';
+	import PasswordDialog from '$lib/components/connection/PasswordDialog.svelte';
+	import { refreshConnections } from '$lib/stores/connections';
+	import type { ConnectionWithStatus } from '$lib/stores/connections';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
+
+	let connectionFormOpen = $state(false);
+	let passwordDialogOpen = $state(false);
+	let selectedConnection = $state<ConnectionWithStatus | null>(null);
+
+	onMount(() => {
+		refreshConnections();
+	});
+
+	function handleNewConnection() {
+		connectionFormOpen = true;
+	}
+
+	function handleSelectConnection(conn: ConnectionWithStatus) {
+		if (conn.connected) {
+			// Already connected — could navigate or show details
+			return;
+		}
+		// Needs password to connect
+		selectedConnection = conn;
+		passwordDialogOpen = true;
+	}
 </script>
 
 <svelte:head>
@@ -17,18 +45,10 @@
 
 <div class="app-shell">
 	<aside class="sidebar">
-		<div class="sidebar-header">
-			<span class="text-logo">Blueprint</span>
-		</div>
-		<div class="sidebar-search">
-			<input type="text" placeholder="Search connections..." class="search-input" />
-		</div>
-		<div class="sidebar-section">
-			<span class="text-section-label">Connections</span>
-		</div>
-		<div class="sidebar-empty">
-			<span style="color: var(--text-ghost); font-size: 11px;">No connections yet</span>
-		</div>
+		<ConnectionSidebar
+			onNewConnection={handleNewConnection}
+			onSelectConnection={handleSelectConnection}
+		/>
 	</aside>
 
 	<main class="content">
@@ -41,6 +61,9 @@
 		</div>
 	</main>
 </div>
+
+<ConnectionForm bind:open={connectionFormOpen} />
+<PasswordDialog bind:open={passwordDialogOpen} connection={selectedConnection} />
 
 <style>
 	.app-shell {
@@ -57,51 +80,6 @@
 		background-color: var(--bg-sidebar);
 		border-right: 1px solid var(--border-default);
 		overflow: hidden;
-	}
-
-	.sidebar-header {
-		display: flex;
-		align-items: center;
-		height: 48px;
-		padding: 0 12px;
-		border-bottom: 1px solid var(--border-default);
-		flex-shrink: 0;
-	}
-
-	.sidebar-search {
-		padding: 8px;
-		flex-shrink: 0;
-	}
-
-	.search-input {
-		width: 100%;
-		height: 28px;
-		padding: 0 8px;
-		background-color: var(--bg-input);
-		border: 1px solid var(--border-default);
-		border-radius: 4px;
-		color: var(--text-primary);
-		font-size: 12px;
-		outline: none;
-		box-sizing: border-box;
-	}
-
-	.search-input::placeholder {
-		color: var(--text-ghost);
-	}
-
-	.search-input:focus {
-		border-color: var(--border-focus);
-	}
-
-	.sidebar-section {
-		padding: 8px 12px 4px;
-		flex-shrink: 0;
-	}
-
-	.sidebar-empty {
-		padding: 8px 12px;
-		flex-shrink: 0;
 	}
 
 	.content {
