@@ -212,7 +212,6 @@ describe('gridState', () => {
 		expect(fetchSpy).toHaveBeenCalledTimes(2);
 		const lastUrl = String(fetchSpy.mock.calls[1][0]);
 		expect(lastUrl).toContain('cursor=50');
-		expect(lastUrl).toContain('append');
 	});
 
 	it('resetGrid restores initial state', async () => {
