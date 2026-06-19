@@ -7,9 +7,19 @@
 	import '@fontsource/geist-mono/600.css';
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import TabBar from '$lib/components/layout/TabBar.svelte';
+	import { restoreTabs } from '$lib/stores/tabs';
+	import { handleKeyboardShortcut } from '$lib/utils/keyboard';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
+
+	onMount(() => {
+		restoreTabs();
+	});
 </script>
+
+<svelte:window onkeydown={handleKeyboardShortcut} />
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
@@ -32,7 +42,9 @@
 	</aside>
 
 	<main class="content">
-		<div class="tab-bar"></div>
+		<div class="tab-bar">
+			<TabBar />
+		</div>
 		<div class="page-content">
 			{@render children()}
 		</div>
