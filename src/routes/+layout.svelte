@@ -12,6 +12,9 @@
 	import PasswordDialog from '$lib/components/connection/PasswordDialog.svelte';
 	import { refreshConnections } from '$lib/stores/connections';
 	import type { ConnectionWithStatus } from '$lib/stores/connections';
+	import TabBar from '$lib/components/layout/TabBar.svelte';
+	import { restoreTabs } from '$lib/stores/tabs';
+	import { handleKeyboardShortcut } from '$lib/utils/keyboard';
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
@@ -22,6 +25,7 @@
 
 	onMount(() => {
 		refreshConnections();
+		restoreTabs();
 	});
 
 	function handleNewConnection() {
@@ -30,14 +34,14 @@
 
 	function handleSelectConnection(conn: ConnectionWithStatus) {
 		if (conn.connected) {
-			// Already connected — could navigate or show details
 			return;
 		}
-		// Needs password to connect
 		selectedConnection = conn;
 		passwordDialogOpen = true;
 	}
 </script>
+
+<svelte:window onkeydown={handleKeyboardShortcut} />
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
@@ -52,7 +56,9 @@
 	</aside>
 
 	<main class="content">
-		<div class="tab-bar"></div>
+		<div class="tab-bar">
+			<TabBar />
+		</div>
 		<div class="page-content">
 			{@render children()}
 		</div>
