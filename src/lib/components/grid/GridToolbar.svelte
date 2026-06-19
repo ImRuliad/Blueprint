@@ -7,9 +7,13 @@
 		columnCount?: number;
 		visibleColumns?: string[];
 		allColumns?: string[];
+		pendingChangeCount?: number;
 		onViewChange?: (mode: ViewMode) => void;
 		onToggleColumn?: (column: string) => void;
 		onExport?: () => void;
+		onReview?: () => void;
+		onCommit?: () => void;
+		onAddRow?: () => void;
 	}
 
 	let {
@@ -18,9 +22,13 @@
 		columnCount = 0,
 		visibleColumns = [],
 		allColumns = [],
+		pendingChangeCount = 0,
 		onViewChange,
 		onToggleColumn,
 		onExport,
+		onReview,
+		onCommit,
+		onAddRow,
 	}: Props = $props();
 
 	let showColumnPicker = $state(false);
@@ -55,10 +63,30 @@
 
 	<div class="toolbar-spacer"></div>
 
+	<!-- Pending changes indicator -->
+	{#if pendingChangeCount > 0}
+		<div class="toolbar-changes" data-testid="pending-changes-badge">
+			<span class="toolbar-changes-badge">{pendingChangeCount}</span>
+			<button class="toolbar-btn toolbar-btn--review" onclick={() => onReview?.()}>
+				Review
+			</button>
+			<button class="toolbar-btn toolbar-btn--commit" onclick={() => onCommit?.()}>
+				Commit
+			</button>
+		</div>
+	{/if}
+
+	<!-- Add row button -->
+	{#if viewMode === 'data'}
+		<button class="toolbar-btn" onclick={() => onAddRow?.()}>
+			+ Row
+		</button>
+	{/if}
+
 	<!-- Metadata -->
 	<div class="toolbar-meta">
 		<span class="toolbar-meta-item">{rowCount} rows</span>
-		<span class="toolbar-meta-sep">·</span>
+		<span class="toolbar-meta-sep">-</span>
 		<span class="toolbar-meta-item">{columnCount} cols</span>
 	</div>
 
@@ -137,6 +165,26 @@
 		flex: 1;
 	}
 
+	.toolbar-changes {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.toolbar-changes-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 18px;
+		height: 18px;
+		padding: 0 5px;
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--text-primary);
+		background: var(--accent-amber);
+		border-radius: 9px;
+	}
+
 	.toolbar-meta {
 		display: flex;
 		align-items: center;
@@ -171,6 +219,26 @@
 	.toolbar-btn:hover {
 		color: var(--text-secondary);
 		background: var(--bg-hover);
+	}
+
+	.toolbar-btn--review {
+		color: var(--accent-amber);
+		border-color: var(--accent-amber);
+	}
+
+	.toolbar-btn--review:hover {
+		color: var(--text-primary);
+		background: rgba(245, 158, 11, 0.1);
+	}
+
+	.toolbar-btn--commit {
+		color: var(--accent-green);
+		border-color: var(--accent-green);
+	}
+
+	.toolbar-btn--commit:hover {
+		color: var(--text-primary);
+		background: rgba(34, 197, 94, 0.1);
 	}
 
 	.col-picker-dropdown {

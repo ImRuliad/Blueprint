@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { ColumnDescriptor } from '$lib/server/drivers/types';
+	import type { PendingChange } from '$lib/stores/changes';
+	import CellEditor from './CellEditor.svelte';
 
 	interface Props {
 		columns?: ColumnDescriptor[];
@@ -7,7 +9,12 @@
 		sortColumn?: string | null;
 		sortDir?: 'ASC' | 'DESC';
 		loading?: boolean;
+		pendingChanges?: PendingChange[];
+		newRows?: Record<string, unknown>[];
+		deletedPks?: Record<string, unknown>[];
 		onSort?: (column: string) => void;
+		onCellEdit?: (rowIndex: number, column: string, oldValue: unknown, newValue: string) => void;
+		onAddRow?: () => void;
 	}
 
 	let {
@@ -16,7 +23,12 @@
 		sortColumn = null,
 		sortDir = 'ASC',
 		loading = false,
+		pendingChanges = [],
+		newRows = [],
+		deletedPks = [],
 		onSort,
+		onCellEdit,
+		onAddRow,
 	}: Props = $props();
 
 	// Column resize state
@@ -62,8 +74,60 @@
 		return classes.join(' ');
 	}
 
+	// Editing state
+	let editingCell = $state<{ rowIndex: number; column: string } | null>(null);
+
 	function handleSort(col: ColumnDescriptor) {
 		onSort?.(col.name);
+	}
+
+	function handleDoubleClick(rowIndex: number, col: ColumnDescriptor) {
+		if (col.isPrimaryKey) return;
+		editingCell = { rowIndex, column: col.name };
+	}
+
+	function handleEditConfirm(rowIndex: number, col: string, oldValue: unknown, newValue: string) {
+		editingCell = null;
+		if (String(oldValue ?? '') !== newValue) {
+			onCellEdit?.(rowIndex, col, oldValue, newValue);
+		}
+	}
+
+	function handleEditCancel() {
+		editingCell = null;
+	}
+
+	function isCellEdited(rowIndex: number, colName: string): boolean {
+		const row = rows[rowIndex];
+		if (!row) return false;
+		return pendingChanges.some(
+			(c) =>
+				c.operation === 'update' &&
+				c.column === colName &&
+				isRowMatchingPk(row, c.pk)
+		);
+	}
+
+	function isRowDeleted(rowIndex: number): boolean {
+		const row = rows[rowIndex];
+		if (!row) return false;
+		return deletedPks.some((pk) => isRowMatchingPk(row, pk));
+	}
+
+	function isRowMatchingPk(row: Record<string, unknown>, pk: Record<string, unknown>): boolean {
+		return Object.entries(pk).every(([k, v]) => row[k] === v);
+	}
+
+	function getRowClass(rowIndex: number): string {
+		const classes = ['grid-tr'];
+		if (isRowDeleted(rowIndex)) classes.push('row-deleted');
+		return classes.join(' ');
+	}
+
+	function getEditableCellClass(col: ColumnDescriptor, value: unknown, rowIndex: number): string {
+		let cls = getCellClass(col, value);
+		if (isCellEdited(rowIndex, col.name)) cls += ' cell-edited';
+		return cls;
 	}
 
 	function getColWidth(col: ColumnDescriptor): string {
@@ -97,7 +161,7 @@
 <div class="grid-container" data-testid="data-grid">
 	{#if loading}
 		<div class="grid-state">
-			<span class="grid-state-text">Loading…</span>
+			<span class="grid-state-text">Loading...</span>
 		</div>
 	{:else if columns.length === 0}
 		<div class="grid-state">
@@ -113,7 +177,7 @@
 							<th
 								class={getThClass(col)}
 								style="width: {getColWidth(col)}; min-width: 60px"
-								title="{col.dataType}{col.nullable ? ' · nullable' : ''}"
+								title="{col.dataType}{col.nullable ? ' - nullable' : ''}"
 							>
 								<button class="grid-th-btn" onclick={() => handleSort(col)}>
 									<span class="grid-th-name">{col.name}</span>
@@ -135,11 +199,21 @@
 				</thead>
 				<tbody>
 					{#each rows as row, i}
-						<tr class="grid-tr">
+						<tr class={getRowClass(i)}>
 							<td class="grid-td grid-td--rownum">{i + 1}</td>
 							{#each columns as col}
-								<td class={getCellClass(col, row[col.name])}>
-									{#if row[col.name] === null || row[col.name] === undefined}
+								<td
+									class={getEditableCellClass(col, row[col.name], i)}
+									ondblclick={() => handleDoubleClick(i, col)}
+									style="position: relative"
+								>
+									{#if editingCell?.rowIndex === i && editingCell?.column === col.name}
+										<CellEditor
+											value={getCellValue(row[col.name])}
+											onConfirm={(v) => handleEditConfirm(i, col.name, row[col.name], v)}
+											onCancel={handleEditCancel}
+										/>
+									{:else if row[col.name] === null || row[col.name] === undefined}
 										<span class="value-null">NULL</span>
 									{:else if typeof row[col.name] === 'boolean'}
 										<span class={row[col.name] ? 'value-bool-true' : 'value-bool-false'}>
@@ -148,6 +222,16 @@
 									{:else}
 										{getCellValue(row[col.name])}
 									{/if}
+								</td>
+							{/each}
+						</tr>
+					{/each}
+					{#each newRows as newRow}
+						<tr class="grid-tr row-new">
+							<td class="grid-td grid-td--rownum">+</td>
+							{#each columns as col}
+								<td class="grid-td">
+									{getCellValue(newRow[col.name])}
 								</td>
 							{/each}
 						</tr>
@@ -322,5 +406,27 @@
 
 	.value-bool-false {
 		color: var(--accent-red);
+	}
+
+	/* Inline editing visual states */
+	.cell-edited {
+		border-left: 3px solid var(--accent-amber);
+	}
+
+	.row-new {
+		background: rgba(34, 197, 94, 0.06);
+	}
+
+	.row-new:hover {
+		background: rgba(34, 197, 94, 0.1);
+	}
+
+	.row-deleted {
+		opacity: 0.5;
+		text-decoration: line-through;
+	}
+
+	.row-deleted:hover {
+		background: rgba(239, 68, 68, 0.06);
 	}
 </style>
