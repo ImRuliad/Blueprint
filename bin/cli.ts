@@ -56,4 +56,13 @@ if (values['data-dir']) {
 }
 
 console.log(`Blueprint starting at http://${host}:${port}`);
-await import('../build/index.js');
+try {
+	await import('../build/index.js');
+} catch (err) {
+	if (err instanceof Error && 'code' in err && (err as any).code === 'ERR_MODULE_NOT_FOUND') {
+		console.error('ERROR: Blueprint has not been built yet. Run "bun run build" first.');
+	} else {
+		console.error('ERROR: Blueprint failed to start.\n', err);
+	}
+	process.exit(1);
+}

@@ -19,7 +19,7 @@ COPY --from=builder /app/package.json ./
 COPY --from=prod-deps /app/node_modules ./node_modules
 
 ENV DOCKER=1
-ENV HOST=127.0.0.1
+ENV HOST=0.0.0.0
 ENV PORT=3000
 
 RUN mkdir -p /data && chown bun:bun /data

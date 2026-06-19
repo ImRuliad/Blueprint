@@ -57,6 +57,7 @@ export function errorResponse(error: unknown): Response {
 			{ status }
 		);
 	}
+	console.error('[Blueprint] Unhandled error in request handler:', error);
 	const isDev = process.env.NODE_ENV === 'development';
 	return Response.json(
 		{

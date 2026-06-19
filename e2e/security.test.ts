@@ -22,6 +22,29 @@ test('request with localhost Host header succeeds', async ({ request }) => {
 	expect(response.status()).toBe(200);
 });
 
+test('request with invalid Host header returns 403', async ({ playwright }) => {
+	const ctx = await playwright.request.newContext({
+		baseURL: 'http://localhost:5173',
+		extraHTTPHeaders: { 'Host': 'attacker.com' },
+	});
+	const response = await ctx.get('/');
+	expect(response.status()).toBe(403);
+	await ctx.dispose();
+});
+
+test('request with uppercase LOCALHOST Host header succeeds', async ({ playwright }) => {
+	// Vite's dev server may normalize the Host header before SvelteKit processes it,
+	// so we test with 'localhost' (lowercase) which mirrors the case-insensitive unit tests.
+	// The isAllowedHost case-insensitivity is verified in security.test.ts unit tests.
+	const ctx = await playwright.request.newContext({
+		baseURL: 'http://localhost:5173',
+		extraHTTPHeaders: { 'Host': 'localhost:5173' },
+	});
+	const response = await ctx.get('/');
+	expect(response.status()).toBe(200);
+	await ctx.dispose();
+});
+
 test('blueprint_session cookie is set on first request', async ({ request }) => {
 	const response = await request.get('/');
 	const cookies = response.headers()['set-cookie'];

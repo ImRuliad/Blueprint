@@ -30,6 +30,22 @@ describe('isAllowedHost', () => {
 		it('allows ::1', () => {
 			expect(isAllowedHost('::1')).toBe(true);
 		});
+
+		it('allows LOCALHOST (uppercase)', () => {
+			expect(isAllowedHost('LOCALHOST')).toBe(true);
+		});
+
+		it('allows Localhost (mixed case)', () => {
+			expect(isAllowedHost('Localhost')).toBe(true);
+		});
+
+		it('allows LOCALHOST:3000 (uppercase with port)', () => {
+			expect(isAllowedHost('LOCALHOST:3000')).toBe(true);
+		});
+
+		it('allows [::1]:3000 (bracketed IPv6 with port)', () => {
+			expect(isAllowedHost('[::1]:3000')).toBe(true);
+		});
 	});
 
 	describe('rejects invalid hosts', () => {
@@ -51,6 +67,10 @@ describe('isAllowedHost', () => {
 
 		it('rejects evil.localhost', () => {
 			expect(isAllowedHost('evil.localhost')).toBe(false);
+		});
+
+		it('rejects localhost:abc (non-digit port)', () => {
+			expect(isAllowedHost('localhost:abc')).toBe(false);
 		});
 	});
 });

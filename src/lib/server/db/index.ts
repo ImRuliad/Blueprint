@@ -9,17 +9,40 @@ import { lt } from 'drizzle-orm';
 import { changeBufferSnapshots } from './schema';
 
 const dataDir = getDataDir();
-mkdirSync(dataDir, { recursive: true });
+
+try {
+	mkdirSync(dataDir, { recursive: true });
+} catch (err) {
+	console.error(`Fatal: cannot create data directory at ${dataDir}. Check permissions or set BLUEPRINT_DATA_DIR`, err);
+	process.exit(1);
+}
 
 const dbPath = join(dataDir, 'meta.db');
-const sqlite = new Database(dbPath);
 
-sqlite.exec('PRAGMA journal_mode=WAL');
-sqlite.exec('PRAGMA foreign_keys=ON');
+let sqlite: InstanceType<typeof Database>;
+try {
+	sqlite = new Database(dbPath);
+} catch (err) {
+	console.error(`Fatal: cannot open database at ${dbPath}. File may be locked or corrupted`, err);
+	process.exit(1);
+}
+
+try {
+	sqlite.exec('PRAGMA journal_mode=WAL');
+	sqlite.exec('PRAGMA foreign_keys=ON');
+} catch (err) {
+	console.error('Fatal: failed to configure SQLite', err);
+	process.exit(1);
+}
 
 export const db = drizzle(sqlite, { schema });
 
-migrate(db, { migrationsFolder: './drizzle' });
+try {
+	migrate(db, { migrationsFolder: './drizzle' });
+} catch (err) {
+	console.error('Fatal: database migration failed. Ensure drizzle/ folder is present', err);
+	process.exit(1);
+}
 
 function purgeStaleSnapshots(): void {
 	const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -28,4 +51,8 @@ function purgeStaleSnapshots(): void {
 		.run();
 }
 
-purgeStaleSnapshots();
+try {
+	purgeStaleSnapshots();
+} catch (err) {
+	console.warn('Warning: failed to purge stale snapshots', err);
+}
