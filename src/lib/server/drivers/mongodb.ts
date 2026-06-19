@@ -14,6 +14,11 @@ import type {
 export interface MongoConfig {
 	uri: string;
 	database: string;
+	tls?: boolean;
+	tlsCAFile?: string;
+	tlsCertificateKeyFile?: string;
+	tlsAllowInvalidCertificates?: boolean;
+	tlsAllowInvalidHostnames?: boolean;
 }
 
 export interface MongoQueryOptions {
@@ -41,6 +46,11 @@ export class MongoDriver implements DatabaseDriver {
 			this.client = new MongoClient(this.config.uri, {
 				connectTimeoutMS: 10_000,
 				serverSelectionTimeoutMS: 10_000,
+				tls: this.config.tls,
+				tlsCAFile: this.config.tlsCAFile,
+				tlsCertificateKeyFile: this.config.tlsCertificateKeyFile,
+				tlsAllowInvalidCertificates: this.config.tlsAllowInvalidCertificates,
+				tlsAllowInvalidHostnames: this.config.tlsAllowInvalidHostnames,
 			});
 			await this.client.connect();
 			this.db = this.client.db(this.config.database);
@@ -69,6 +79,11 @@ export class MongoDriver implements DatabaseDriver {
 			tempClient = new MongoClient(this.config.uri, {
 				connectTimeoutMS: 5_000,
 				serverSelectionTimeoutMS: 5_000,
+				tls: this.config.tls,
+				tlsCAFile: this.config.tlsCAFile,
+				tlsCertificateKeyFile: this.config.tlsCertificateKeyFile,
+				tlsAllowInvalidCertificates: this.config.tlsAllowInvalidCertificates,
+				tlsAllowInvalidHostnames: this.config.tlsAllowInvalidHostnames,
 			});
 			await tempClient.connect();
 			await tempClient.db(this.config.database).admin().ping();
