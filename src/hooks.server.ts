@@ -11,5 +11,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 		});
 	}
 
-	return resolve(event);
+	const response = await resolve(event);
+
+	response.headers.set('X-Frame-Options', 'DENY');
+	response.headers.set('X-Content-Type-Options', 'nosniff');
+	response.headers.set(
+		'Content-Security-Policy',
+		"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; frame-ancestors 'none';"
+	);
+
+	return response;
 };
