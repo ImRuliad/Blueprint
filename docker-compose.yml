@@ -5,7 +5,11 @@ services:
       - "127.0.0.1:3000:3000"
     volumes:
       - blueprint-data:/data
-      - ~/.ssh:/home/bun/.ssh:ro
+      # Optional: Mount SSH keys for tunnel connections.
+      # For security, prefer mounting specific keys:
+      #   - ${SSH_KEY_PATH:-~/.ssh/id_ed25519}:/home/bun/.ssh/id_ed25519:ro
+      # Only uncomment the full .ssh mount if you need multiple keys:
+      # - ~/.ssh:/home/bun/.ssh:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
