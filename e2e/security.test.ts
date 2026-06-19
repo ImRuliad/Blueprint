@@ -21,3 +21,13 @@ test('request with localhost Host header succeeds', async ({ request }) => {
 	const response = await request.get('/');
 	expect(response.status()).toBe(200);
 });
+
+test('blueprint_session cookie is set on first request', async ({ request }) => {
+	const response = await request.get('/');
+	const cookies = response.headers()['set-cookie'];
+	expect(cookies).toBeDefined();
+	expect(cookies).toContain('blueprint_session=');
+	expect(cookies).toContain('HttpOnly');
+	expect(cookies).toContain('SameSite=Strict');
+	expect(cookies).toContain('Max-Age=604800');
+});
