@@ -8,6 +8,9 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit()
 	],
+	build: {
+		sourcemap: process.env.NODE_ENV !== 'production',
+	},
 	resolve: {
 		alias: {
 			// Redirect bun:sqlite to a no-op stub when running under Node/Vite dev SSR.
