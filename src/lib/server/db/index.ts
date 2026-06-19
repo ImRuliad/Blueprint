@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { Database } from 'bun:sqlite';
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
-import { mkdirSync } from 'fs';
+import { mkdirSync, chmodSync } from 'fs';
 import { join } from 'path';
 import { getDataDir } from '$lib/utils/platform';
 import * as schema from './schema';
@@ -11,7 +11,7 @@ import { changeBufferSnapshots } from './schema';
 const dataDir = getDataDir();
 
 try {
-	mkdirSync(dataDir, { recursive: true });
+	mkdirSync(dataDir, { recursive: true, mode: 0o700 });
 } catch (err) {
 	console.error(`Fatal: cannot create data directory at ${dataDir}. Check permissions or set BLUEPRINT_DATA_DIR`, err);
 	process.exit(1);
@@ -25,6 +25,12 @@ try {
 } catch (err) {
 	console.error(`Fatal: cannot open database at ${dbPath}. File may be locked or corrupted`, err);
 	process.exit(1);
+}
+
+try {
+	chmodSync(dbPath, 0o600);
+} catch {
+	// Best effort — may fail on Windows or some filesystems
 }
 
 try {
