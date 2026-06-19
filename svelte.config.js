@@ -14,6 +14,10 @@ const config = {
 			envPrefix: 'BLUEPRINT_'
 		}),
 		csrf: {
+			// SECURITY: Empty array means ONLY the server's own origin is trusted
+			// for state-changing requests (POST/PUT/DELETE/PATCH).
+			// Blueprint is localhost-only — DO NOT add external origins here.
+			// SvelteKit's built-in Origin header check remains active.
 			trustedOrigins: []
 		}
 	},
