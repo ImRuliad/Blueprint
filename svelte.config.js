@@ -13,6 +13,17 @@ const config = {
 			precompress: false,
 			envPrefix: 'BLUEPRINT_'
 		}),
+		csp: {
+			directives: {
+				'default-src': ['self'],
+				'script-src': ['self'],
+				'style-src': ['self', 'unsafe-inline'],
+				'img-src': ['self', 'data:', 'blob:'],
+				'connect-src': ['self'],
+				'font-src': ['self'],
+				'frame-ancestors': ['none']
+			}
+		},
 		csrf: {
 			// SECURITY: Empty array means ONLY the server's own origin is trusted
 			// for state-changing requests (POST/PUT/DELETE/PATCH).
