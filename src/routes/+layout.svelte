@@ -13,7 +13,10 @@
 	import { refreshConnections } from '$lib/stores/connections';
 	import type { ConnectionWithStatus } from '$lib/stores/connections';
 	import TabBar from '$lib/components/layout/TabBar.svelte';
-	import { restoreTabs } from '$lib/stores/tabs';
+	import TabPlaceholder from '$lib/components/layout/TabPlaceholder.svelte';
+	import DataBrowser from '$lib/components/browser/DataBrowser.svelte';
+	import SqlQueryPanel from '$lib/components/browser/SqlQueryPanel.svelte';
+	import { restoreTabs, activeTab as activeTabStore } from '$lib/stores/tabs';
 	import { handleKeyboardShortcut } from '$lib/utils/keyboard';
 	import { openTab, setActiveTab, tabs } from '$lib/stores/tabs';
 	import { get } from 'svelte/store';
@@ -76,7 +79,21 @@
 			<TabBar />
 		</div>
 		<div class="page-content">
-			{@render children()}
+			{#if $activeTabStore}
+				{#if $activeTabStore.type === 'data-browser'}
+					{#key $activeTabStore.id}
+						<DataBrowser connectionId={$activeTabStore.connectionId} />
+					{/key}
+				{:else if $activeTabStore.type === 'sql-editor'}
+					{#key $activeTabStore.id}
+						<SqlQueryPanel connectionId={$activeTabStore.connectionId} />
+					{/key}
+				{:else}
+					<TabPlaceholder />
+				{/if}
+			{:else}
+				{@render children()}
+			{/if}
 		</div>
 		<div class="status-bar">
 			<span class="text-data-cell" style="color: var(--text-ghost);">Ready</span>

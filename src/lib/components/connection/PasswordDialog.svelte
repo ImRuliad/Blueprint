@@ -4,6 +4,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { refreshConnections } from '$lib/stores/connections';
 	import type { ConnectionWithStatus } from '$lib/stores/connections';
+	import { openTab } from '$lib/stores/tabs';
 
 	interface Props {
 		open: boolean;
@@ -68,6 +69,13 @@
 			});
 			if (res.ok) {
 				await refreshConnections();
+				openTab({
+					type: 'data-browser',
+					title: connection.name,
+					connectionId: connection.id,
+					params: {},
+					closable: true,
+				});
 				handleOpenChange(false);
 			} else {
 				const result = await res.json();
