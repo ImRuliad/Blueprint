@@ -31,6 +31,8 @@ export class SQLiteDriver implements DatabaseDriver {
 		try {
 			this.db = new Database(this.config.filePath, {
 				readonly: this.config.readonly ?? false,
+				readwrite: !(this.config.readonly ?? false),
+				create: true,
 			});
 			this.db.exec('PRAGMA journal_mode = WAL');
 			this.db.exec('PRAGMA foreign_keys = ON');

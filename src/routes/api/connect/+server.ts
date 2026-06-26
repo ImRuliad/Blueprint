@@ -3,10 +3,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
 import { connections, sshConfigs, tlsConfigs } from '$lib/server/db/schema';
 import { createPool, isConnected } from '$lib/server/drivers/pool';
-import { PostgresDriver } from '$lib/server/drivers/postgres';
-import { MySQLDriver } from '$lib/server/drivers/mysql';
 import { SQLiteDriver } from '$lib/server/drivers/sqlite';
-import { MongoDriver } from '$lib/server/drivers/mongodb';
 import { errorResponse, NotFoundError, ValidationError } from '$lib/server/errors';
 import type { DatabaseDriver, EngineType } from '$lib/server/drivers/types';
 import { buildPostgresSSL, buildMySQLSSL, buildMongoTLS } from '$lib/server/tls/config';
@@ -16,17 +13,18 @@ import type { SSHTunnelConfig } from '$lib/server/ssh/tunnel';
 import { readFileSync, existsSync } from 'fs';
 import { eq } from 'drizzle-orm';
 
-function createDriver(
+async function createDriver(
 	engine: EngineType,
 	config: Record<string, unknown>,
 	tlsConfig: TLSConfig | null,
 	tunnelPort?: number
-): DatabaseDriver {
+): Promise<DatabaseDriver> {
 	const host = tunnelPort != null ? '127.0.0.1' : (config.host as string);
 	const port = tunnelPort != null ? tunnelPort : (config.port as number);
 
 	switch (engine) {
-		case 'postgresql':
+		case 'postgresql': {
+			const { PostgresDriver } = await import('$lib/server/drivers/postgres');
 			return new PostgresDriver({
 				host,
 				port,
@@ -34,7 +32,9 @@ function createDriver(
 				user: config.username as string,
 				ssl: tlsConfig ? buildPostgresSSL(tlsConfig) : undefined,
 			});
-		case 'mysql':
+		}
+		case 'mysql': {
+			const { MySQLDriver } = await import('$lib/server/drivers/mysql');
 			return new MySQLDriver({
 				host,
 				port,
@@ -42,11 +42,13 @@ function createDriver(
 				user: config.username as string,
 				ssl: tlsConfig ? buildMySQLSSL(tlsConfig) : undefined,
 			});
+		}
 		case 'sqlite':
 			return new SQLiteDriver({
 				filePath: config.sqlitePath as string,
 			});
 		case 'mongodb': {
+			const { MongoDriver } = await import('$lib/server/drivers/mongodb');
 			const tlsOpts = tlsConfig ? buildMongoTLS(tlsConfig) : {};
 			return new MongoDriver({
 				uri: config.connectionString as string,
@@ -132,7 +134,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			tunnel = await createTunnel(sshTunnelConfig, remoteHost, remotePort, tunnelKey);
 		}
 
-		const driver = createDriver(
+		const driver = await createDriver(
 			row.engine as EngineType,
 			connConfig,
 			tlsConfig,

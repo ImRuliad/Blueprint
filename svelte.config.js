@@ -19,7 +19,8 @@ const config = {
 				'script-src': ['self'],
 				'style-src': ['self', 'unsafe-inline'],
 				'img-src': ['self', 'data:', 'blob:'],
-				'connect-src': ['self'],
+				'connect-src': ['self', 'ws:'],
+				'worker-src': ['self', 'blob:'],
 				'font-src': ['self'],
 				'frame-ancestors': ['none']
 			}

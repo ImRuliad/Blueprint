@@ -353,6 +353,7 @@ Carthage/Build/
 *.sqlite
 *.sqlite3
 *.db
+!tests/database/mock.db
 *.db3
 *.s3db
 *.sl3

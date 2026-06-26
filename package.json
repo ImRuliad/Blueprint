@@ -9,7 +9,7 @@
 	},
 	"files": ["build/", "drizzle/", "bin/"],
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "bunx --bun vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"start": "bun run bin/cli.ts",
