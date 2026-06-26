@@ -15,6 +15,8 @@
 	import TabBar from '$lib/components/layout/TabBar.svelte';
 	import { restoreTabs } from '$lib/stores/tabs';
 	import { handleKeyboardShortcut } from '$lib/utils/keyboard';
+	import { openTab, setActiveTab, tabs } from '$lib/stores/tabs';
+	import { get } from 'svelte/store';
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
@@ -34,6 +36,20 @@
 
 	function handleSelectConnection(conn: ConnectionWithStatus) {
 		if (conn.connected) {
+			const existing = get(tabs).find(
+				(t) => t.connectionId === conn.id && t.type === 'data-browser'
+			);
+			if (existing) {
+				setActiveTab(existing.id);
+			} else {
+				openTab({
+					type: 'data-browser',
+					title: conn.name,
+					connectionId: conn.id,
+					params: {},
+					closable: true,
+				});
+			}
 			return;
 		}
 		selectedConnection = conn;
